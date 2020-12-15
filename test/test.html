@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>axios</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="content">
+      <div class="search">
+        <input type="text" v-model="in1">
+      </div>
+      <ul v-if='isShow'>
+        <li v-for="(item,index) in jsonData" :key="index">
+          <div class="header-letter">{{index}}</div>
+          <ul>
+            <li v-for='info in item' :key="info.id">{{info.name}}</li>
+          </ul>
+        </li>
+      </ul>
+      <ul v-else>
+        <li class="place" v-for='(i,s) in ids' :key="s">{{i.name}}</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <script>
+    Vue.prototype.$axios = axios;//把axios挂载到vue上
+    new Vue({
+      el: "#app",
+      created:
+        function () {
+          this.$axios.get('./city.json').then((res) => {
+            // console.log(res.data)
+            this.jsonData = res.data;
+          })
+        },
+      watch: {
+        in1: function (newval) {
+          var arr = [];
+          var test = [];
+          console.log(newval)
+          if (newval == 0) {
+            this.ids = [];
+            this.isShow = true;
+          } else {
+
+            for (var a in this.jsonData) {
+              test = this.jsonData[a].filter(el => {
+                //console.log(el.name)
+                var exist = el.name.includes(newval);
+                return exist;
+              });
+              test.length > 0 ? arr = arr.concat(test) : test = [];
+            }
+            this.ids = arr;
+            this.ids.length > 0 ? this.isShow = false : this.isShow = true;
+          }
+          console.log(arr);
+        }
+      },
+      data() {
+        return {
+          letters: [],
+          jsonData: null,
+          in1: null,
+          isShow: true,
+          ids: null
+        }
+      },
+
+    })
+  </script>
+</body>
+
+</html>
